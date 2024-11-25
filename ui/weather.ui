@@ -75,19 +75,19 @@
      <string>날씨조회</string>
     </property>
    </widget>
-   <widget class="QLabel" name="area_label">
+   <widget class="QLabel" name="weather_area_label">
     <property name="geometry">
      <rect>
       <x>40</x>
       <y>90</y>
       <width>381</width>
-      <height>41</height>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <family>맑은 고딕</family>
-      <pointsize>12</pointsize>
+      <pointsize>16</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>

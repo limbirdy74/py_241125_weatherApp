@@ -1,3 +1,8 @@
+# 0.6 날씨 이미지 추가
+# 0.6 엔터 입력시 작동 추가
+# 0.6 프로그램 시작 시 현재 지역 날씨 추가
+# 0.6 공란으로
+
 #  app 만드는 기본모듈
 import sys
 from PyQt5.QtWidgets import *
@@ -17,21 +22,32 @@ from bs4 import BeautifulSoup
 form_class = uic.loadUiType("ui/weather.ui")[0]
 # QT Designer에서 만든 외부 ui 불러오기
 
+
 class WeatherApp(QMainWindow, form_class):
     def __init__(self):
         super().__init__()  # 부모 클래스의 생성자 호출
         self.setupUi(self)  # 불러온 ui 파일을 연결. 윈도우 app 생성시 거의 여기까지 유사하게 함.
 
-        self.setWindowTitle("날씨 조회")  # 윈도우 제목
+        self.setWindowTitle("네이버 날씨 프로그램")  # 윈도우 제목
         self.setWindowIcon(QIcon("img/weather.png"))  # 윈도우 아이콘
-        self.statusBar().showMessage("네이버 날씨 앱 v0.5")
+        self.statusBar().showMessage("네이버 날씨 앱 v0.6")
 
         self.setWindowFlag(Qt.WindowStaysOnTopHint)  # 항상 위 옵션
 
-        self.weather_btn.clicked.connect(self.weather_search)  # 날씨 조회 버튼 클릭시 weather_search 메소드 호출
+        self.weather_search(1)  # 프로그램 실행시 자동으로 한번 실행. 공란으로 검색하니까 현재 지역으로 조회
 
-    def weather_search(self):
+        self.weather_btn.clicked.connect(self.weather_search_call)  # 날씨 조회 버튼 클릭시 weather_search 메소드 호출
+        self.area_input_edit.returnPressed.connect(self.weather_search_call)  # enter 입력시 작동
+        
+    def weather_search_call(self):
+        self.weather_search(0)
+
+    def weather_search(self, startFlag):
         inputArea = self.area_input_edit.text()  # 사용자가 입력한 지역명 텍스트 가져오기
+
+        if inputArea == "" and startFlag != 1:
+            QMessageBox.information(self, "날씨정보", "지역을 입력하지 않으시면\n현재 지역의 날씨가 출력됩니다")
+        # 처음 자동실행하면 경고창이 떠서 함수를 추가해서 해결
 
         html = requests.get(f"https://search.naver.com/search.naver?query={inputArea}+날씨")
         soup = BeautifulSoup(html.text, "html.parser")
@@ -69,11 +85,32 @@ class WeatherApp(QMainWindow, form_class):
         # ui 해당 label에 크롤링한 텍스트 출력
         self.weather_area_label.setText(areaText)
         self.now_temper_label.setText(nowTemperText)
-        self.weather_image_label.setText(weatherText)
+        # self.weather_image_label.setText(weatherText)
+        self.weather_image(weatherText)
         self.yester_temp_label.setText(yesterdayTempText)
         self.sense_temper_label.setText(senseTemperText)
         self.dust1_info_label.setText(dustInfo1)
         self.dust2_info_label.setText(dustInfo1)
+
+    def weather_image(self, weather_text):
+        if "맑음" in weather_text:
+            weatherImage = QPixmap("img/sun.png")  # 준비한 이미지 불러와서 저장
+        elif "흐림" in weather_text:
+            weatherImage = QPixmap("img/cloud.png")
+        elif "구름" in weather_text:
+            weatherImage = QPixmap("img/cloud.png")
+        elif "비" in weather_text:
+            weatherImage = QPixmap("img/rain.png")
+        elif "소나기" in weather_text:
+            weatherImage = QPixmap("img/rain.png")
+        elif "눈" in weather_text:
+            weatherImage = QPixmap("img/snow.png")
+        else:
+            self.weather_image_label.setText(weather_text)  # 일치된 이미지가 없을 경우.
+            weatherImage = 1
+
+        if weatherImage != 1:  # 일치된 이미지가 있을 때만
+            self.weather_image_label.setPixmap(QPixmap(weatherImage))  # label에 이미지 출력
 
 
 #  고해상도 모니터용 코드. -------------------------------------------------
