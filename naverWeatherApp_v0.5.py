@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt  # 화면 앞으로 보내기
 #  고해상도 모니터용---------------------------------------
 from os import environ
 import multiprocessing as mp
-# ---------------------------------------------------------
+# --------------------------------------------------------
 
 import requests
 from bs4 import BeautifulSoup
